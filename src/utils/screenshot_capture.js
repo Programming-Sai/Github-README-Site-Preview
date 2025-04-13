@@ -5,7 +5,7 @@ import puppeteer from "puppeteer";
  * @param {string} url - The site URL to capture.
  * @param {object} options - { width, height, outputPath }
  */
-export async function captureScreenshot(url, { width = 1280, height = 720, outputPath }) {
+export async function captureScreenshot(url, themeToggleSelector, { width = 1280, height = 720, outputPath }) {
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -24,7 +24,13 @@ export async function captureScreenshot(url, { width = 1280, height = 720, outpu
     // Delay manually
     await new Promise((r) => setTimeout(r, 3000));
 
-    await page.screenshot({ path: outputPath });
+    // Capture dark
+    await clickToggle(page, toggleSelector);
+    await page.screenshot({ path: darkOutput });
+
+    // Capture light
+    await clickToggle(page, toggleSelector);
+    await page.screenshot({ path: lightOutput });
     console.log(`✅ Screenshot saved to ${outputPath}`);
   } catch (err) {
     console.error("❌ Error taking screenshot:", err.message);

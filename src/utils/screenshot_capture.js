@@ -11,7 +11,7 @@ import { clickToggle } from "./themeToggle.js";
 
 
 
-export async function captureScreenshot(url, { width = 1280, height = 720, outputPath }, themeToggleSelector = null) {
+export async function captureScreenshot(url, { width = 1280, height = 720 }, themeToggleSelector = null) {
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -43,7 +43,7 @@ export async function captureScreenshot(url, { width = 1280, height = 720, outpu
       const buffer = await page.screenshot();
       buffers.push(buffer);
       console.log(`✅ Screenshot Taken`);
-    }
+    } 
 
     return buffers;
     

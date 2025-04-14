@@ -1,7 +1,8 @@
 import path from "path";
+import fs from "fs";
 import { captureScreenshot } from "./utils/screenshot_capture.js";
 import { hideBin } from "yargs/helpers";
-import yargs from "yargs/yargs";  // use yargs/yargs for ESM
+import yargs from "yargs/yargs";  
 import { laptop, tablet, mobile } from "./config/deviceConfigs.js";
 import { embedScreenshotInMockup } from "./utils/embed.js";
 
@@ -23,6 +24,7 @@ const argv = yargs(hideBin(process.argv))
         .positional("output", {
           describe: "Path to save the screenshot",
           type: "string",
+          default: "public",
         })
         .positional("selectors", {
           describe: "Comma-separated list of CSS selectors",
@@ -51,7 +53,7 @@ const argv = yargs(hideBin(process.argv))
     alias: "o",
     description: "Path to save the screenshot",
     type: "string",
-    default: "public/preview.png",
+    default: "public/",
   })
   .option("selectors", {
     alias: "s",
@@ -62,6 +64,8 @@ const argv = yargs(hideBin(process.argv))
   .help()
   .alias("help", "h")
   .argv;
+
+
 
 async function processCapture(argv) {
   const devices = argv.devices.split(",").map((device) => {
@@ -91,32 +95,44 @@ async function processCapture(argv) {
 
 
   const testUrl = argv.url;
-  const savePath = path.resolve(argv.output);
+  const savePath = path.isAbsolute(argv.output)
+  ? argv.output.trim()
+  : path.resolve(argv.output.trim());
 
-  const buffersPerDevice = [];
 
-  for (const device of devices) {
-    const screenshotBuffers = await captureScreenshot(
-      testUrl,
-      {
-        width: device.screenPosition.width,
-        height: device.screenPosition.height,
-        outputPath: savePath, // Temp name, will change later
-      },
-      // [
-      //   "#categoryTop > div.navbar_header__KApwF > div.navbar_end__6YQcj > div.themetoggle_container__SfpgS",
-      //   "#categoryTop > div.navbar_header__KApwF > div:nth-child(3) > div",
-      // ]
-      selectors,
-    );
-
-    if (screenshotBuffers?.length) {
-      buffersPerDevice.push({ device, screenshotBuffers });
-    } else {
-      console.warn(`⚠️ Skipping ${device.name} — no screenshots captured.`);
-    }
-    
+  // Reject if it looks like a file
+  if (path.extname(savePath)) {
+    console.error("❌ Error: Output must be a directory, not a file path.");
+    process.exit(1);
   }
+
+  if (!fs.existsSync(savePath)) {
+    fs.mkdirSync(savePath, { recursive: true });
+  }
+
+
+  const results = await Promise.all(
+  devices.map(async (device) => {
+      const screenshotBuffers = await captureScreenshot(
+        testUrl,
+        {
+          width: device.screenPosition.width,
+          height: device.screenPosition.height,
+        },
+        selectors
+      );
+
+      if (screenshotBuffers?.length) {
+        return { device, screenshotBuffers };
+      } else {
+        console.warn(`⚠️ Skipping ${device.name} — no screenshots captured.`);
+        return null;
+      }
+    })
+  );
+
+  const buffersPerDevice = results.filter(Boolean);
+
 
   if (buffersPerDevice.length === 0) {
     console.error("❌ The link provided appears to be invalid or unreachable.");
@@ -129,7 +145,7 @@ async function processCapture(argv) {
 
     for (let i = 0; i < screenshotBuffers.length; i++) {
       const themeLabel = screenshotBuffers.length === 2 ? `_theme${i + 1}` : "";
-      const outputPath = path.resolve(`public/output_${deviceLabel}${themeLabel}.png`);
+      const outputPath = path.join(savePath, `output_${deviceLabel}${themeLabel}.png`);
       await embedScreenshotInMockup({
         ...device,
         screenshotBuffer: screenshotBuffers[i],
@@ -143,57 +159,3 @@ async function processCapture(argv) {
 
 
 
-
-
-
-// // const testUrl = "https://v.com";
-// // const testUrl = "https://blog-daa9s.vercel.app/about/llk";
-// const testUrl = "https://blog-da9s.vercel.app/about/llk";
-// // const testUrl = "https://github.com";
-// const savePath = path.resolve("public\\preview.png");
-
-// // const config = laptop;
-// // const config = tablet;
-// // const config = mobile;
-
-
-
-// // const devices = [laptop, tablet, mobile];
-
-
-
-
-
-
-// const buffers = await captureScreenshot(
-//   testUrl,
-//   {
-//     width: config?.screenPosition?.width,
-//     height: config?.screenPosition?.height,
-//     outputPath: savePath,
-//   },
-//   [
-//     "#categoryTop > div.navbar_header__KApwF > div.navbar_end__6YQcj > div.themetoggle_container__SfpgS",
-//     "#categoryTop > div.navbar_header__KApwF > div:nth-child(3) > div",
-//   ]
-// );
-
-
-// for (let i = 0; i < buffers.length; i++) {
-//   const themeLabel = buffers.length === 2 ? `_theme${i + 1}` : "";
-//   const outputPath = savePath.replace(/\.png$/, `${themeLabel}.png`);
-//   await embedScreenshotInMockup({
-//     screenshotBuffer: buffers[i],
-//     mockupPath: config.mockupPath,
-//     outputPath,
-//     screenPosition: config.screenPosition,
-//     borderRadius: config.borderRadius,
-//   });
-  
-// }
-
-
-
-
-
-// // await embedScreenshotInMockup(config);

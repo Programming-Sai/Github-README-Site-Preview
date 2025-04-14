@@ -1,16 +1,22 @@
 import puppeteer from "puppeteer";
+import { clickToggle } from "./themeToggle.js";
 
 /**
- * Capture a screenshot of a webpage.
+ * Capture one or two screenshots of a webpage.
  * @param {string} url - The site URL to capture.
- * @param {object} options - { width, height, outputPath }
+ * @param {object} options - { width, height }
+ * @param {string|null} themeToggleSelector - Optional selector to toggle themes.
+ * @returns {Promise<Buffer[]>} - Array of screenshot buffers.
  */
-export async function captureScreenshot(url, themeToggleSelector, { width = 1280, height = 720, outputPath }) {
+
+
+
+export async function captureScreenshot(url, { width = 1280, height = 720, outputPath }, themeToggleSelector = null) {
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
-
+  const buffers = [];
   const page = await browser.newPage();
   await page.setViewport({ width, height, });
 
@@ -24,16 +30,26 @@ export async function captureScreenshot(url, themeToggleSelector, { width = 1280
     // Delay manually
     await new Promise((r) => setTimeout(r, 3000));
 
-    // Capture dark
-    await clickToggle(page, toggleSelector);
-    await page.screenshot({ path: darkOutput });
+    if (themeToggleSelector) {
 
-    // Capture light
-    await clickToggle(page, toggleSelector);
-    await page.screenshot({ path: lightOutput });
-    console.log(`✅ Screenshot saved to ${outputPath}`);
+      const buffer1 = await page.screenshot();
+      buffers.push(buffer1);
+      await clickToggle(page, themeToggleSelector);
+      const buffer2 = await page.screenshot();
+      buffers.push(buffer2);
+
+      console.log(`✅ Screenshots Taken.`);
+    } else {
+      const buffer = await page.screenshot();
+      buffers.push(buffer);
+      console.log(`✅ Screenshot Taken`);
+    }
+
+    return buffers;
+    
   } catch (err) {
-    console.error("❌ Error taking screenshot:", err.message);
+    console.error("❌ Error   taking screenshot:", err.message);
+    return []; 
   } finally {
     await browser.close();
   }

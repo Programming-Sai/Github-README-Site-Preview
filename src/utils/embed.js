@@ -1,18 +1,26 @@
 import sharp from "sharp";
 
 /**
- * Embeds a screenshot into a mockup image with rounded corners.
- * @param {object} options - Configuration options
+ * Embeds a screenshot (as buffer) into a mockup image with rounded corners.
+ * @param {object} options - Configuration options.
+ * @param {Buffer} options.screenshotBuffer - The screenshot buffer.
+ * @param {string} options.mockupPath - Path to mockup image.
+ * @param {string} options.outputPath - Output file path.
+ * @param {object} options.screenPosition - { top, left, width, height }
+ * @param {number} [options.borderRadius=20] - Optional rounded corner radius.
  */
+
+
+
 export async function embedScreenshotInMockup({
-  screenshotPath,
+  screenshotBuffer,
   mockupPath,
   outputPath,
   screenPosition, // { top, left, width, height }
   borderRadius = 20, // Optional: default to 40px
 }) {
   // Resize screenshot
-  const resizedScreenshot = await sharp(screenshotPath)
+  const resizedScreenshot = await sharp(screenshotBuffer)
     .resize(screenPosition.width, screenPosition.height)
     .toBuffer();
 
@@ -46,49 +54,3 @@ export async function embedScreenshotInMockup({
 
 
 
-
-
-// import sharp from 'sharp';
-// import fs from 'fs';
-
-// /**
-//  * Embed screenshot into a mockup with rounded corners
-//  * @param {Buffer} screenshotImage - The screenshot image buffer.
-//  * @param {string} mockupImagePath - The mockup image path.
-//  * @param {object} position - Positioning of the screenshot (top, left, width, height).
-//  * @param {string} outputPath - Where to save the final mockup with embedded screenshot.
-//  */
-// export async function embedScreenshotInMockupWithRoundedCorners(screenshotImage, mockupImagePath, position, outputPath) {
-//   // Load the mockup image
-//   const mockupImage = sharp(mockupImagePath);
-
-//   // Load the screenshot image and resize to fit the screen area
-//   const resizedScreenshot = await sharp(screenshotImage)
-//     .resize(position.width, position.height)
-//     .toBuffer();
-
-//   // Create a rounded rectangle mask (for clipping corners)
-//   const mask = Buffer.from(`
-//     <svg width="${position.width}" height="${position.height}">
-//       <rect x="0" y="0" width="${position.width}" height="${position.height}" rx="40" ry="40" />
-//     </svg>
-//   `);
-
-//   // Composite the screenshot and the mask onto the mockup
-//   await mockupImage
-//     .composite([
-//       { input: resizedScreenshot, top: position.top, left: position.left, raw: { width: position.width, height: position.height, channels: 4 }, blend: 'over' },
-//       { input: mask, raw: { width: position.width, height: position.height, channels: 4 }, blend: 'dest-in' },
-//     ])
-//     .toFile(outputPath);
-
-//   console.log(`✅ Final image with rounded corners saved to ${outputPath}`);
-// }
-
-// // // Example usage:
-// // embedScreenshotInMockupWithRoundedCorners(
-// //   'screenshot.png',   // Screenshot image path
-// //   'mockup.png',       // Mockup image path
-// //   { top: 120, left: 80, width: 375, height: 812 }, // Position
-// //   'final_mockup.png'  // Output path for final image
-// // );

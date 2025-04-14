@@ -101,13 +101,23 @@ node src/index.js "https://example.com" "laptop,tablet" "public/preview.png" ".b
 
 ### Command-Line Options
 
-- `--url` or `-u`: **(Required)** The URL of the website to capture.
-- `--devices` or `-d`: Comma-separated list of device names. Valid values: `laptop`, `tablet`, `mobile`.  
+- **`--url`** or **`-u`**:  
+  **(Required)** The URL of the website to capture.
+
+- **`--devices`** or **`-d`**:  
+  Comma-separated list of device names. Valid values: `laptop`, `tablet`, `mobile`.  
   _Default_: `laptop,tablet,mobile`
-- `--output` or `-o`: Path to save the temporary screenshot (this is used internally; final images are output in the `public/` folder).  
-  _Default_: `public/preview.png`
-- `--selectors` or `-s`: Comma-separated list of CSS selectors to target specific elements for theme toggling (optional).  
-  _Default_: (empty)
+
+- **`--output`** or **`-o`**:  
+  **(Required if using positional args)** The directory where the result (screenshots and mockup images) will be saved.  
+  **Important:** This must be a directory path (e.g., `public`) and **must not include a filename or file extension.**  
+  _Default_: `public`
+
+- **`--selectors`** or **`-s`**:  
+  Comma-separated list of CSS selectors to target specific elements for theme toggling.  
+  _Default_: _(empty)_
+
+> **Note:** If you omit any named parameters (especially `--output`), the values may shift, so it’s recommended to always specify these flags explicitly.
 
 ### Sample Output Files
 

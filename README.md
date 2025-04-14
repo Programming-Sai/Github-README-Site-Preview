@@ -4,7 +4,7 @@
 
 <!-- PLACEHOLDER: Add a demo banner or screenshot here -->
 
-![Demo Image Placeholder](./public/output_laptop.png)
+![GitHub README Site Preview](./public/output_laptop_theme1.png)
 
 ## Table of Contents
 

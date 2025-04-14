@@ -9,7 +9,7 @@ import { embedScreenshotInMockup } from "./utils/embed.js";
 // Set up yargs to accept either named options or positional arguments
 const argv = yargs(hideBin(process.argv))
   .command(
-    "$0 <url> <devices> <output> [selectors]",
+    "$0 <url> [devices] [output] [selectors]",
     "Capture screenshots with specified parameters",
     (yargs) => {
       yargs
@@ -20,9 +20,10 @@ const argv = yargs(hideBin(process.argv))
         .positional("devices", {
           describe: "Comma-separated list of devices (e.g. laptop,tablet,mobile)",
           type: "string",
+          default: "laptop",
         })
         .positional("output", {
-          describe: "Path to save the screenshot",
+          describe: "Path to save the result or the screenshot + mockups",
           type: "string",
           default: "public",
         })
@@ -47,13 +48,13 @@ const argv = yargs(hideBin(process.argv))
     alias: "d",
     description: "Comma-separated list of devices (e.g., laptop,tablet,mobile)",
     type: "string",
-    default: "laptop,tablet,mobile",
+    default: "laptop",
   })
   .option("output", {
     alias: "o",
-    description: "Path to save the screenshot",
+    description: "Path to save the result or the screenshot + mockups",
     type: "string",
-    default: "public/",
+    default: "public",
   })
   .option("selectors", {
     alias: "s",
@@ -88,27 +89,28 @@ async function processCapture(argv) {
 
   const selectors = argv.selectors ? argv.selectors.split(",").map(s => s.trim()) : [];
 
-  // console.log("URL:", argv.url);
-  // console.log("Output:", path.resolve(argv.output));
-  // console.log("Devices:", devices);
-  // console.log("Selectors:", selectors);
+  console.log("URL:", argv.url);
+  console.log("Output:", path.resolve(argv.output));
+  console.log("Devices:", devices);
+  console.log("Selectors:", selectors);
 
 
   const testUrl = argv.url;
-  const savePath = path.isAbsolute(argv.output)
-  ? argv.output.trim()
-  : path.resolve(argv.output.trim());
+  const savePath = argv.output
+  ? (path.isAbsolute(argv.output.trim()) ? path.resolve(argv.output.trim()) : path.resolve(argv.output.trim()))
+  : path.resolve("public");
 
-
-  // Reject if it looks like a file
+  // Reject if it looks like a file path (e.g., includes file extension)
   if (path.extname(savePath)) {
     console.error("❌ Error: Output must be a directory, not a file path.");
     process.exit(1);
   }
 
+  // If the directory doesn't exist, create it
   if (!fs.existsSync(savePath)) {
     fs.mkdirSync(savePath, { recursive: true });
-  }
+}
+
 
 
   const results = await Promise.all(

@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Programming-Sai/Github-README-Site-Preview#readme",
   "dependencies": {
     "puppeteer": "^24.6.1",
-    "sharp": "^0.34.1"
+    "sharp": "^0.34.1",
+    "yargs": "^17.7.2"
   }
 }

@@ -4,7 +4,9 @@ import { captureScreenshot } from "./utils/screenshot_capture.js";
 import { laptop, tablet, mobile } from "./config/deviceConfigs.js";
 import { embedScreenshotInMockup } from "./utils/embed.js";
 
-const testUrl = "https://blog-da9s.vercel.app/about";
+// const testUrl = "https://v.com";
+// const testUrl = "https://blog-daa9s.vercel.app/about/llk";
+const testUrl = "https://blog-da9s.vercel.app/about/llk";
 // const testUrl = "https://github.com";
 const savePath = path.resolve("public\\preview.png");
 
@@ -26,10 +28,10 @@ for (const device of devices) {
       height: device.screenPosition.height,
       outputPath: path.resolve("public/preview.png"), // Temp name, will change later
     },
-    [
-      "#categoryTop > div.navbar_header__KApwF > div.navbar_end__6YQcj > div.themetoggle_container__SfpgS",
-      "#categoryTop > div.navbar_header__KApwF > div:nth-child(3) > div",
-    ]
+    // [
+    //   "#categoryTop > div.navbar_header__KApwF > div.navbar_end__6YQcj > div.themetoggle_container__SfpgS",
+    //   "#categoryTop > div.navbar_header__KApwF > div:nth-child(3) > div",
+    // ]
   );
 
   if (screenshotBuffers?.length) {
@@ -39,6 +41,12 @@ for (const device of devices) {
   }
   
 }
+
+if (buffersPerDevice.length === 0) {
+  console.error("❌ The link provided appears to be invalid or unreachable.");
+  process.exit(1); // optional: exit script with error code
+}
+
 
 for (const { device, screenshotBuffers } of buffersPerDevice) {
   const deviceLabel = device.name?.toLowerCase() || "device";

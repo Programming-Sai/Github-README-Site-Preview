@@ -46,7 +46,7 @@ npm install
 
 The project is organized into several parts:
 
-```bash
+```ftt
 
 ./Github-README-Site-Preview/*
         ├─ assets/*

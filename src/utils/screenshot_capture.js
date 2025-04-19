@@ -31,7 +31,7 @@ export async function captureScreenshot(url, { width = 1280, height = 720 }, the
     // Delay manually
     await new Promise((r) => setTimeout(r, 3000));
 
-    if (themeToggleSelector) {
+    if (Array.isArray(themeToggleSelector) && themeToggleSelector.length > 0) {
 
       const buffer1 = await page.screenshot();
       buffers.push(buffer1);

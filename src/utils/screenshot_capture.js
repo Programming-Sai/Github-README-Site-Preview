@@ -12,6 +12,7 @@ import { clickToggle } from "./themeToggle.js";
 
 
 export async function captureScreenshot(url, { width = 1280, height = 720 }, themeToggleSelector = null) {
+  if (themeToggleSelector === "null") themeToggleSelector = null;
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],

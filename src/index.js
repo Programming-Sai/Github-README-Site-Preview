@@ -87,6 +87,8 @@ async function processCapture(argv) {
     console.warn("⚠️ No valid devices were selected. Please choose from 'laptop', 'tablet', or 'mobile'.");
   }
 
+  if (argv.selectors === 'null') argv.selectors = null;
+
   const selectors = argv.selectors ? argv.selectors.split(",").map(s => s.trim()) : [];
 
   console.log("URL:", argv.url);

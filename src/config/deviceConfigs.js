@@ -29,6 +29,6 @@ const mobile = {
   borderRadius: 20,
 };
 
-console.log(mobile?.mockupPath)
+// console.log(mobile?.mockupPath)
 
 export { laptop, tablet, mobile };
